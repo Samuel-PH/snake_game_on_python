@@ -118,3 +118,50 @@ def calculate_movement_delay_milliseconds(base_speed_milliseconds, current_snake
         speed_reduction_amount = current_snake_length * 0.5
         calculated_delay = max(25, int(base_speed_milliseconds - speed_reduction_amount))
         return calculated_delay
+
+#Main Menu
+def display_main_menu(starting_grid_index, starting_difficulty_index, starting_wrap_index):
+    list_of_grid_options = [32, 64]
+    list_of_difficulty_options = ["Easy", "Hard"]
+    list_of_wall_options = ["Wrap", "Solid"]
+    
+    current_grid_index = starting_grid_index
+    current_difficulty_index = starting_difficulty_index
+    current_wrap_index = starting_wrap_index
+    
+    currently_highlighted_row = 0
+    is_menu_running = True
+
+    while is_menu_running:
+        game_window_display.fill(color_background) 
+        pygame.draw.rect(game_window_display, color_header_background, (0, 0, window_width, header_height))
+        
+        draw_text_on_screen("SNAKE", font_large_text, color_snake_body, window_width // 2, 120)
+        draw_text_on_screen("WASD / Arrows to Move. Enter to Start.", font_small_text, (150, 150, 150), window_width // 2, 180)
+
+        legend_y_position = 220
+        pygame.draw.rect(game_window_display, apples_types_data['small']['color'], (200, legend_y_position, 20, 20))
+        draw_text_on_screen("= +1", font_small_text, color_normal_text, 230, legend_y_position, is_centered=False)
+        
+        pygame.draw.rect(game_window_display, apples_types_data['medium']['color'], (280, legend_y_position, 20, 20))
+        draw_text_on_screen("= +3", font_small_text, color_normal_text, 310, legend_y_position, is_centered=False)
+        
+        pygame.draw.rect(game_window_display, apples_types_data['large']['color'], (360, legend_y_position, 20, 20))
+        draw_text_on_screen("= +5", font_small_text, color_normal_text, 390, legend_y_position, is_centered=False)
+
+        row_color = color_normal_text if currently_highlighted_row == 0 else color_normal_text
+        row_text = f"Grid Size: < {list_of_grid_options[current_grid_index]}x{list_of_grid_options[current_grid_index]} >"
+        draw_text_on_screen(row_text, font_medium_text, row_color, window_width // 2, 290)
+        
+        row_color = color_normal_text if currently_highlighted_row == 1 else color_normal_text
+        row_text = f"Difficulty: < {list_of_difficulty_options[current_difficulty_index]} >"
+        draw_text_on_screen(row_text, font_medium_text, row_color, window_width // 2, 340)
+
+        row_color = color_normal_text if currently_highlighted_row == 2 else color_normal_text
+        row_text = f"Walls: < {list_of_wall_options[current_wrap_index]} >"
+        draw_text_on_screen(row_text, font_medium_text, row_color, window_width // 2, 390)
+
+        row_color = color_normal_text if currently_highlighted_row == 3 else color_normal_text
+        draw_text_on_screen("START GAME", font_medium_text, row_color, window_width // 2, 460)
+
+        pygame.display.flip()
