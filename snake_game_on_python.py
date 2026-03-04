@@ -28,9 +28,9 @@ BASE_DIRECTORY_PATH = os.path.dirname(os.path.abspath(__file__))
 CONFIGURATION_FILE_PATH = os.path.join(BASE_DIRECTORY_PATH, "snake_config.json")
 
 #fonts
-font_small_text = pygame.font.Sysfont ("arial", 20)
-font_medium_text =  pygame.font.Sysfont ("arial", 32)
-font_large_text = pygame.font.Sysfont ("arial", 50)
+font_small_text = pygame.font.SysFont ("arial", 20)
+font_medium_text =  pygame.font.SysFont ("arial", 32)
+font_large_text = pygame.font.SysFont ("arial", 50)
 
 #set up of display
 game_window_display = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_WIDTH + HEADER_HEIGHT))
