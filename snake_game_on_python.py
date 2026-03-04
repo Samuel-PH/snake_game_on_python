@@ -7,7 +7,7 @@ import os
 pygame.init()
 
 #global constants (must be writen in upper case)
-WINDOW_WIDTH = 640
+WINDOW_WIDTH = 832
 HEADER_HEIGHT = 60   
 
 COLOR_BACKGROUND = (20, 20, 20)
@@ -140,14 +140,16 @@ def display_main_menu(starting_grid_index, starting_difficulty_index, starting_w
         draw_text_on_screen("WASD / Arrows to Move. Enter to Start.", font_small_text, (150, 150, 150), WINDOW_WIDTH // 2, 180)
 
         legend_y_position = 220
-        pygame.draw.rect(game_window_display, APPLE_TYPES_DATA['small']['color'], (200, legend_y_position, 20, 20))
-        draw_text_on_screen("= +1", font_small_text, COLOR_NORMAL_TEXT, 230, legend_y_position, is_centered=False)
+        center_x = WINDOW_WIDTH // 2
         
-        pygame.draw.rect(game_window_display, APPLE_TYPES_DATA['medium']['color'], (280, legend_y_position, 20, 20))
-        draw_text_on_screen("= +3", font_small_text, COLOR_NORMAL_TEXT, 310, legend_y_position, is_centered=False)
+        pygame.draw.rect(game_window_display, APPLE_TYPES_DATA['small']['color'], (center_x - 120, legend_y_position, 20, 20))
+        draw_text_on_screen("= +1", font_small_text, COLOR_NORMAL_TEXT, center_x - 90, legend_y_position, is_centered=False)
         
-        pygame.draw.rect(game_window_display, APPLE_TYPES_DATA['large']['color'], (360, legend_y_position, 20, 20))
-        draw_text_on_screen("= +5", font_small_text, COLOR_NORMAL_TEXT, 390, legend_y_position, is_centered=False)
+        pygame.draw.rect(game_window_display, APPLE_TYPES_DATA['medium']['color'], (center_x - 40, legend_y_position, 20, 20))
+        draw_text_on_screen("= +3", font_small_text, COLOR_NORMAL_TEXT, center_x - 10, legend_y_position, is_centered=False)
+        
+        pygame.draw.rect(game_window_display, APPLE_TYPES_DATA['large']['color'], (center_x + 40, legend_y_position, 20, 20))
+        draw_text_on_screen("= +5", font_small_text, COLOR_NORMAL_TEXT, center_x + 70, legend_y_position, is_centered=False)
 
         row_color = COLOR_SELECTED_TEXT if currently_highlighted_row == 0 else COLOR_NORMAL_TEXT
         row_text = f"Grid Size: < {list_of_grid_options[current_grid_index]}x{list_of_grid_options[current_grid_index]} >"
