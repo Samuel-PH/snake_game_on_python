@@ -198,7 +198,6 @@ def display_main_menu(starting_grid_index, starting_difficulty_index, starting_w
                     return current_grid_index, current_difficulty_index, current_wrap_index
                 
 def execute_game_loop(chosen_grid_size, chosen_difficulty, is_wall_wrap_enabled):
-
     grid_width_maximum = chosen_grid_size
     grid_height_maximum = chosen_grid_size
     pixel_size_per_cell = WINDOW_WIDTH // grid_width_maximum 
@@ -262,3 +261,56 @@ def execute_game_loop(chosen_grid_size, chosen_difficulty, is_wall_wrap_enabled)
                     if user_event.key == pygame.K_r: return "restart"
                     elif user_event.key == pygame.K_m: return "menu"
                     elif user_event.key == pygame.K_q: pygame.quit(); sys.exit()
+
+        current_time_milliseconds = pygame.time.get_ticks()
+        required_delay_before_move = calculate_movement_delay_milliseconds(base_delay_milliseconds, len(snake_body_coordinates), chosen_difficulty)
+
+        if not is_game_over and not is_game_won:
+
+            if current_time_milliseconds - time_of_last_movement > required_delay_before_move:
+                time_of_last_movement = current_time_milliseconds
+                if player_input_buffer_queue:
+                    current_moving_direction = player_input_buffer_queue.pop(0)
+                current_head_x, current_head_y = snake_body_coordinates[0]
+                direction_x, direction_y = current_moving_direction
+                raw_new_head_x = current_head_x + direction_x
+                raw_new_head_y = current_head_y + direction_y
+                
+                # Check Wall Settings
+                if is_wall_wrap_enabled:
+                    final_new_head_position = (raw_new_head_x % grid_width_maximum, raw_new_head_y % grid_height_maximum)
+                else:
+                    final_new_head_position = (raw_new_head_x, raw_new_head_y)
+                    if not (0 <= final_new_head_position[0] < grid_width_maximum) or not (0 <= final_new_head_position[1] < grid_height_maximum):
+                        is_game_over = True
+
+                # Check Self-Collision
+                if not is_game_over:
+                    if final_new_head_position in snake_body_coordinates:
+                        is_game_over = True
+                    else:
+
+                        snake_body_coordinates.insert(0, final_new_head_position)
+                        
+                        eaten_apple_data = None
+                        for active_apple in list_of_active_apples:
+                            if active_apple['position'] == final_new_head_position:
+                                eaten_apple_data = active_apple
+                                break
+                        
+                        if eaten_apple_data:
+                            list_of_active_apples.remove(eaten_apple_data)
+                            
+                            pending_growth_segments += (eaten_apple_data['growth_value'] - 1)
+                            
+                            if len(snake_body_coordinates) >= grid_width_maximum * grid_height_maximum:
+                                is_game_won = True
+                            else:
+                                while len(list_of_active_apples) < maximum_apples_allowed:
+                                    spawned_apple = generate_new_apple(grid_width_maximum, grid_height_maximum, snake_body_coordinates, list_of_active_apples)
+                                    list_of_active_apples.append(spawned_apple)
+                        else:
+                            if pending_growth_segments > 0:
+                                pending_growth_segments -= 1
+                            else:
+                                snake_body_coordinates.pop()
