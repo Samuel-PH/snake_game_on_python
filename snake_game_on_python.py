@@ -238,3 +238,27 @@ def execute_game_loop(chosen_grid_size, chosen_difficulty, is_wall_wrap_enabled)
                 pygame.quit()
                 sys.exit()
 
+            if user_event.type == pygame.KEYDOWN:
+                if user_event.key == pygame.K_UP or user_event.key == pygame.K_w:
+                    currently_highlighted_row = (currently_highlighted_row - 1) % 4
+                elif user_event.key == pygame.K_DOWN or user_event.key == pygame.K_s:
+                    currently_highlighted_row = (currently_highlighted_row + 1) % 4
+
+                elif user_event.key == pygame.K_LEFT or user_event.key == pygame.K_a:
+                    if currently_highlighted_row == 0: 
+                        current_grid_index = (current_grid_index - 1) % len(list_of_grid_options)
+                    elif currently_highlighted_row == 1: 
+                        current_difficulty_index = (current_difficulty_index - 1) % len(list_of_difficulty_options)
+                    elif currently_highlighted_row == 2: 
+                        current_wrap_index = (current_wrap_index - 1) % len(list_of_wall_options)
+
+                elif user_event.key == pygame.K_RIGHT or user_event.key == pygame.K_d:
+                    if currently_highlighted_row == 0: 
+                        current_grid_index = (current_grid_index + 1) % len(list_of_grid_options)
+                    elif currently_highlighted_row == 1: 
+                        current_difficulty_index = (current_difficulty_index + 1) % len(list_of_difficulty_options)
+                    elif currently_highlighted_row == 2: 
+                        current_wrap_index = (current_wrap_index + 1) % len(list_of_wall_options)
+
+                elif user_event.key == pygame.K_RETURN:
+                    return current_grid_index, current_difficulty_index, current_wrap_index
