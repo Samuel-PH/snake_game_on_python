@@ -196,3 +196,69 @@ def display_main_menu(starting_grid_index, starting_difficulty_index, starting_w
                 
                 elif user_event.key == pygame.K_RETURN:
                     return current_grid_index, current_difficulty_index, current_wrap_index
+                
+def execute_game_loop(chosen_grid_size, chosen_difficulty, is_wall_wrap_enabled):
+
+    grid_width_maximum = chosen_grid_size
+    grid_height_maximum = chosen_grid_size
+    pixel_size_per_cell = WINDOW_WIDTH // grid_width_maximum 
+    
+    base_delay_milliseconds = 100 if chosen_difficulty == "Easy" else 66
+    maximum_apples_allowed = 5 if chosen_difficulty == "Easy" else 3
+
+    starting_x_coordinate = grid_width_maximum // 2
+    starting_y_coordinate = grid_height_maximum // 2
+    
+    snake_body_coordinates = [
+        (starting_x_coordinate, starting_y_coordinate), 
+        (starting_x_coordinate - 1, starting_y_coordinate), 
+        (starting_x_coordinate - 2, starting_y_coordinate)
+    ]
+    
+    current_moving_direction = (1, 0) # Moving Right
+    player_input_buffer_queue = []    # Buffer to hold fast key presses
+    pending_growth_segments = 0       # How much the snake still needs to grow after eating
+    list_of_active_apples = []
+
+    while len(list_of_active_apples) < maximum_apples_allowed:
+        new_apple = generate_new_apple(grid_width_maximum, grid_height_maximum, snake_body_coordinates, list_of_active_apples)
+        list_of_active_apples.append(new_apple)
+
+    time_of_last_movement = pygame.time.get_ticks() 
+    is_game_running = True
+    is_game_over = False
+    is_game_won = False
+    
+    while is_game_running:
+        
+        for user_event in pygame.event.get():
+            if user_event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+            if user_event.type == pygame.KEYDOWN:
+                if not is_game_over:
+
+                    if player_input_buffer_queue: 
+                        last_planned_direction = player_input_buffer_queue[-1]
+                    else: 
+                        last_planned_direction = current_moving_direction
+
+                    new_planned_direction = None
+                    
+                    if (user_event.key == pygame.K_UP or user_event.key == pygame.K_w) and last_planned_direction != (0, -1): 
+                        new_planned_direction = (0, -1)
+                    elif (user_event.key == pygame.K_DOWN or user_event.key == pygame.K_s) and last_planned_direction != (0, -1): 
+                        new_planned_direction = (0, 1)
+                    elif (user_event.key == pygame.K_LEFT or user_event.key == pygame.K_a) and last_planned_direction != (1, 0): 
+                        new_planned_direction = (-1, 0)
+                    elif (user_event.key == pygame.K_RIGHT or user_event.key == pygame.K_d) and last_planned_direction != (-1, 0): 
+                        new_planned_direction = (1, 0)
+                    
+                    # Store up to 3 rapid keystrokes to prevent input loss
+                    if new_planned_direction and len(player_input_buffer_queue) < 3:
+                        player_input_buffer_queue.append(new_planned_direction)
+                else:
+                    if user_event.key == pygame.K_r: return "restart"
+                    elif user_event.key == pygame.K_m: return "menu"
+                    elif user_event.key == pygame.K_q: pygame.quit(); sys.exit()
