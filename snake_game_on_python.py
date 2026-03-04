@@ -314,3 +314,79 @@ def execute_game_loop(chosen_grid_size, chosen_difficulty, is_wall_wrap_enabled)
                                 pending_growth_segments -= 1
                             else:
                                 snake_body_coordinates.pop()
+
+#Drawings
+        game_window_display.fill(COLOR_BACKGROUND)
+        
+        pygame.draw.rect(game_window_display, COLOR_HEADER_BACKGROUND, (0, 0, WINDOW_WIDTH, HEADER_HEIGHT))
+        pygame.draw.line(game_window_display, (50, 50, 50), (0, HEADER_HEIGHT), (WINDOW_WIDTH, HEADER_HEIGHT), 2)
+
+        for active_apple in list_of_active_apples:
+            apple_x_coordinate, apple_y_coordinate = active_apple['position']
+            apple_color = active_apple['color']
+            apple_rectangle = (apple_x_coordinate * pixel_size_per_cell, apple_y_coordinate * pixel_size_per_cell + HEADER_HEIGHT, pixel_size_per_cell, pixel_size_per_cell)
+            pygame.draw.rect(game_window_display, apple_color, apple_rectangle)
+
+        for segment_index, snake_segment_coordinates in enumerate(snake_body_coordinates):
+            segment_color = COLOR_SNAKE_HEAD if segment_index == 0 else COLOR_SNAKE_BODY
+            segment_rectangle = (snake_segment_coordinates[0] * pixel_size_per_cell, snake_segment_coordinates[1] * pixel_size_per_cell + HEADER_HEIGHT, pixel_size_per_cell, pixel_size_per_cell)
+            pygame.draw.rect(game_window_display, segment_color, segment_rectangle)
+
+        current_score = calculate_current_score(len(snake_body_coordinates), grid_width_maximum, grid_height_maximum)
+        draw_text_on_screen(f"Score: {current_score}", font_medium_text, COLOR_NORMAL_TEXT, WINDOW_WIDTH // 2, HEADER_HEIGHT // 2)
+        
+        walls_status_text = "Wrap" if is_wall_wrap_enabled else "Solid"
+        draw_text_on_screen(f"{chosen_difficulty} | Walls: {walls_status_text}", font_small_text, (150, 150, 150), 100, HEADER_HEIGHT // 2)
+        
+        if pending_growth_segments > 0:
+            draw_text_on_screen(f"Growing...", font_small_text, (50, 205, 50), WINDOW_WIDTH - 60, HEADER_HEIGHT // 2)
+
+        center_y_coordinate_for_text = (WINDOW_WIDTH // 2) + HEADER_HEIGHT
+        
+        if is_game_over:
+            draw_text_on_screen("GAME OVER", font_large_text, (255, 50, 50), WINDOW_WIDTH // 2, center_y_coordinate_for_text - 60)
+            draw_text_on_screen(f"Final Score: {current_score}", font_medium_text, COLOR_NORMAL_TEXT, WINDOW_WIDTH // 2, center_y_coordinate_for_text)
+            draw_text_on_screen("Press 'R' to Restart", font_small_text, COLOR_NORMAL_TEXT, WINDOW_WIDTH // 2, center_y_coordinate_for_text + 40)
+            draw_text_on_screen("Press 'M' for Menu", font_small_text, COLOR_NORMAL_TEXT, WINDOW_WIDTH // 2, center_y_coordinate_for_text + 70)
+        
+        if is_game_won:
+            draw_text_on_screen("YOU WIN!", font_large_text, (50, 255, 215), WINDOW_WIDTH // 2, center_y_coordinate_for_text - 60)
+            draw_text_on_screen("Perfect Score: 1000", font_medium_text, COLOR_NORMAL_TEXT, WINDOW_WIDTH // 2, center_y_coordinate_for_text)
+            draw_text_on_screen("Press 'R' to Restart", font_small_text, COLOR_NORMAL_TEXT, WINDOW_WIDTH // 2, center_y_coordinate_for_text + 40)
+            draw_text_on_screen("Press 'M' for Menu", font_small_text, COLOR_NORMAL_TEXT, WINDOW_WIDTH // 2, center_y_coordinate_for_text + 70)
+
+        pygame.display.flip() 
+        game_timing_clock.tick(60) # Lock the game engine to 60 Frames Per Second
+
+#Ignition States
+if __name__ == "__main__":
+    loaded_user_settings = load_user_settings_from_file()
+    saved_grid_index = loaded_user_settings["grid_index"]
+    saved_difficulty_index = loaded_user_settings["difficulty_index"]
+    saved_wrap_index = loaded_user_settings["wall_wrap_index"]
+    
+    actual_grid_options = [32, 64]
+    actual_difficulty_options = ["Easy", "Hard"]
+    actual_wrap_options = [True, False] 
+
+    current_game_state = "MENU"
+    
+    while True:
+        if current_game_state == "MENU":
+            saved_grid_index, saved_difficulty_index, saved_wrap_index = display_main_menu(saved_grid_index, saved_difficulty_index, saved_wrap_index)
+            
+            save_user_settings_to_file(saved_grid_index, saved_difficulty_index, saved_wrap_index)
+            
+            current_game_state = "GAME"
+        
+        elif current_game_state == "GAME" or current_game_state == "RESTART":
+            chosen_grid_value = actual_grid_options[saved_grid_index]
+            chosen_difficulty_value = actual_difficulty_options[saved_difficulty_index]
+            chosen_wrap_value = actual_wrap_options[saved_wrap_index]
+            
+            gameplay_result = execute_game_loop(chosen_grid_value, chosen_difficulty_value, chosen_wrap_value)
+            
+            if gameplay_result == "restart": 
+                current_game_state = "RESTART"
+            elif gameplay_result == "menu": 
+                current_game_state = "MENU"
