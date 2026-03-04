@@ -19,9 +19,9 @@ COLOR_SNAKE_HEAD = (0, 155, 0)
 
 #apple power ups (mechanics)
 APPLE_TYPES_DATA = {
-    "small": {"color": (255, 60, 60), "growth_value": 1, "spawn-chance": 0.70},
-    "medium": {"color": (255, 165, 0), "growth_value": 3, "spawn-chance": 0.20},
-    "large": {"color": (147, 112, 219), "growth_value": 5, "spawn-chance": 0.10}
+    "small": {"color": (255, 60, 60), "growth_value": 1, "spawn_chance": 0.70},
+    "medium": {"color": (255, 165, 0), "growth_value": 3, "spawn_chance": 0.20},
+    "large": {"color": (147, 112, 219), "growth_value": 5, "spawn_chance": 0.10}
 }
 
 BASE_DIRECTORY_PATH = os.path.dirname(os.path.abspath(__file__))
